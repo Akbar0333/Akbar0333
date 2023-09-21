@@ -1,416 +1,270 @@
+#include <SoftwareSerial.h>
+SoftwareSerial bt(0,2);
+String inputs;
+
+bool sw =1;
+int s1=0;
+int ss = 20;
 #include <EEPROM.h>
-#define out1 2
-#define out2 3
-#define out3 4
-#define out4 5
-#define out5 6
-#define out6 7
-#define out7 8
-#define out8 9
-#define out9 10
-#define out10 11
-#define out11 12
-#define out12 13
+#define Lock 4
+#define relay1 5
+#define relay2 6
+#define relay3 7
+#define relay4 8
+#define relay5 9
+#define relay6 10
+#define relay7 11
+#define relay8 12
+#define dipar 13
 
-int de=500,y=500,x=500;
-int th=30,la=500;
-int temar=0,hh=0,mm=0,ss=0;
+long re1 = 0, re2 = 0, re3 = 0, re4 = 0, re5 = 0, re6 = 0,
+     re7 = 0, re8 = 0;
+void setup() {
+  Serial.begin(9600);
+bt.begin(9600);
+  pinMode(Lock, OUTPUT);
+  pinMode(dipar, OUTPUT);
 
-int set=A5,on=A1,low=A2,light=A3,temp=A4;
-
-void setup(){
-    Serial.begin(9600);
+  pinMode(relay1, OUTPUT);
+  pinMode(relay2, OUTPUT);
+  pinMode(relay3, OUTPUT);
+  pinMode(relay4, OUTPUT);
+  pinMode(relay5, OUTPUT);
+  pinMode(relay6, OUTPUT);
+  pinMode(relay7, OUTPUT);
+  pinMode(relay8, OUTPUT);
+  re1 = EEPROM.read(1);
+  re2 = EEPROM.read(2);
+  re3 = EEPROM.read(2);
+  re4 = EEPROM.read(4);
+  re5 = EEPROM.read(5);
+  re6 = EEPROM.read(6);
+  re7 = EEPROM.read(7);
+  re8 = EEPROM.read(8);
+  digitalWrite(relay1, re1);
+  digitalWrite(relay2, re2);
+  digitalWrite(relay3, re3);
+  digitalWrite(relay4, re4);
+  digitalWrite(relay5, re5);
+  digitalWrite(relay6, re6);
+  digitalWrite(relay7, re7);
+  digitalWrite(relay8, re8);
+}
+void loop() {
+  
+  if (sw== 1) {
     
-    pinMode(out1,OUTPUT);
-    pinMode(out2,OUTPUT);
-    pinMode(out3,OUTPUT);
-    pinMode(out4,OUTPUT);
-    pinMode(out5,OUTPUT);
-    pinMode(out1,OUTPUT);
-    pinMode(out6,OUTPUT);
-    pinMode(out7,OUTPUT);
-    pinMode(out8,OUTPUT);
-    pinMode(out9,OUTPUT);
-    pinMode(out10,OUTPUT);
-    pinMode(out11,OUTPUT);
-    pinMode(out12,OUTPUT);
-    pinMode(light,INPUT_PULLUP);
-    pinMode(on,INPUT_PULLUP);
-    pinMode(set,INPUT_PULLUP);
-    pinMode(low,INPUT_PULLUP);
-    pinMode(temp,INPUT_PULLUP);
-    if(EEPROM.read(0)==0){}
-else{
+    if (ss>0) {ss = ss - 1;
+      delay(500);
       
-   hh_write();
-   mm_write();
-    ss_write();          
-EEPROM.write(0, 0);
-}
- hh_read(); 
- mm_read();
- ss_read();
- }
-void loop(){
-    int set= digitalRead(A5);
-    int on= digitalRead(A1);
-    int low= digitalRead(A2);
-    int light= analogRead(A3);
-    int temp= analogRead(A4);
-    if(temp<200){
-     digitalWrite(out8,HIGH);
-        delay(100);
-        }
-      else{
-       digitalWrite(out8,LOW);
-        }
+      Serial.println(ss);
+      bt.println(ss);
+      bt.println(";");
+      delay(100);
+      digitalWrite(dipar, HIGH);
     
-    delay(100);
-    Serial.println(temp);
-    delay(200);
-    if(on==0){
-        if(temar<20){temar=temar+1;
-            
-        }
-        if(temar==20){
-            digitalWrite(out9,HIGH);
-            Serial.println(temar);
-            if(set==0){
-          digitalWrite(out12,HIGH);
-           delay(100);
-          digitalWrite(out12,LOW);   
-           delay(100);  
-        hh+1;
-        hh++;
-        hh+2;
-        hh++;
-        delay(100);
-        hh=hh;
-           hh_write();    
-        
-       }     
+    if (ss == 0) {
+     digitalWrite(dipar, LOW);
+     ss=0;
+     s1=0;
+      while (Serial.available()==0) {}
     }
-       
     }
+  }
+
+
+
+  if (s1==0) {
+
+    s1 = Serial.parseInt();
     
-    if(on==0){
-        
-        if(temar<20){temar=temar+1;
-            
-        }
-        if(temar==20){
-            Serial.println(temar);
-            
-    if(low==0){
-        hh=0;
-           digitalWrite(out12,HIGH);
-           delay(100);
-          digitalWrite(out12,LOW);   
-           delay(100);
-         hh=hh;
-          digitalWrite(out2,LOW);
-          digitalWrite(out3,LOW); 
-          digitalWrite(out4,LOW);
-          digitalWrite(out5,LOW); 
-          digitalWrite(out6,LOW);
-          digitalWrite(out7,LOW); 
-          digitalWrite(out8,LOW);
-          digitalWrite(out9,LOW); 
-          digitalWrite(out10,LOW);
-          digitalWrite(out11,LOW); 
-          digitalWrite(out12,LOW);        
-          hh_write(); 
-            
-    }
-    }
+    for (int l = 1; l <= s1; l += 1) {
+delay(500);
+
+      digitalWrite(Lock, HIGH);
+      delay(500);
+      digitalWrite(Lock, LOW);
+      delay(500);
+
+      if (s1==1) {
+        ss = 20;
       }
-    else{
-            delay(100);
-        digitalWrite(out9,LOW);
-            temar=0;
-        }
+      Serial.println(l);
+    }
+  }
+
+
+
+  while (Serial.available())
+
+  {
+
+    delay(10);
+    char c = Serial.read();
+
+
+
+    inputs += c;
+    if (inputs.length() > 0) {
+      
+    ss=20;  
     
-    if(light<500){
-        hh+1;
-        hh++;
+
+      Serial.println(inputs);
+
+      if (inputs == "A") {
+
+        digitalWrite(relay1, HIGH);
+        EEPROM.write(1, 1);
+      } else if (inputs == "B")
+
+      {
+
+        digitalWrite(relay2, HIGH);
+        EEPROM.write(2, 1);
+
+      } else if (inputs == "C") {
+
+        digitalWrite(relay3, HIGH);
+        EEPROM.write(3, 1);
+      }
+
+      else if (inputs == "D") {
+
+        digitalWrite(relay4, HIGH);
+        EEPROM.write(4, 1);
+      }
+
+      else if (inputs == "E") {
+
+        digitalWrite(relay5, HIGH);
+        EEPROM.write(5, 1);
+      }
+
+      else if (inputs == "F") {
+        re6 = ~re6;
+        digitalWrite(relay6, HIGH);
+        EEPROM.write(6, 1);
+      }
+
+      else if (inputs == "G") {
+
+        digitalWrite(relay7, HIGH);
+        EEPROM.write(7, 1);
+      }
+
+      else if (inputs == "H") {
+
+        digitalWrite(relay8, HIGH);
+        EEPROM.write(8, 1);
+      } else if (inputs == "a") {
+
+        digitalWrite(relay1, LOW);
+        EEPROM.write(1, 0);
+      } else if (inputs == "b")
+
+      {
+
+        digitalWrite(relay2, LOW);
+        EEPROM.write(2, 0);
+
+      } else if (inputs == "c") {
+
+        digitalWrite(relay3, LOW);
+        EEPROM.write(3, 0);
+      }
+
+      else if (inputs == "d") {
+
+        digitalWrite(relay4, LOW);
+        EEPROM.write(4, 0);
+      }
+
+      else if (inputs == "e") {
+
+        digitalWrite(relay5, LOW);
+        EEPROM.write(5, 0);
+      }
+
+      else if (inputs == "f") {
+        re6 = ~re6;
+        digitalWrite(relay6, LOW);
+        EEPROM.write(6, 0);
+      }
+
+      else if (inputs == "g") {
+
+        digitalWrite(relay7, LOW);
+        EEPROM.write(7, 0);
+      }
+
+      else if (inputs == "h") {
+
+        digitalWrite(relay8, LOW);
+        EEPROM.write(8, 0);
+      }
+
+      else if (inputs == "W") {
+        digitalWrite(relay1, 1);
+        EEPROM.write(1, 1);
+
+        digitalWrite(relay2, 1);
+        EEPROM.write(2, 1);
+
+        digitalWrite(relay3, 1);
+        EEPROM.write(3, 1);
+
+        digitalWrite(relay4, 1);
+        EEPROM.write(4, 1);
+
+        digitalWrite(relay5, 1);
+        EEPROM.write(5, 1);
+
+        digitalWrite(relay6, 1);
+        EEPROM.write(6, 1);
+
+        digitalWrite(relay7, 1);
+        EEPROM.write(7, 1);
+
+        digitalWrite(relay8, 1);
+        EEPROM.write(8, 1);
+
+      }
+
+      else if (inputs == "w") {
+
+        digitalWrite(relay1, 0);
+        EEPROM.write(1, 0);
+
+        digitalWrite(relay2, 0);
+        EEPROM.write(2, 0);
+
+        digitalWrite(relay3, 0);
+        EEPROM.write(3, 0);
+
+        digitalWrite(relay4, 0);
+        EEPROM.write(4, 0);
+
+        digitalWrite(relay5, 0);
+        EEPROM.write(5, 0);
+
+        digitalWrite(relay6, 0);
+        EEPROM.write(6, 0);
+
+        digitalWrite(relay7, 0);
+        EEPROM.write(7, 0);
+
+        digitalWrite(relay8, 0);
+        EEPROM.write(8, 0);
+      }
+
+      for (int l = 1; l <= 3; l++) {
+        digitalWrite(dipar, HIGH);
         delay(100);
-        hh=hh;
-        
-        hh_write();
-        
+        digitalWrite(dipar, LOW);
+        delay(100);
+        inputs = "";
+      }
     }
-    switch(hh){
-        
-        
-        case 0:
-        digitalWrite(out2,HIGH);
-        digitalWrite(out1,true);
-        delay(250);
-        digitalWrite(out1,false);
-        delay(250);
-        break;
-        
-        case 1: //j.j.m
-        for(int i=1;i<=2;i++){   
-        digitalWrite(out1,HIGH);
-        delay(x);
-        digitalWrite(out1,LOW);
-        delay(x);
-        }
-        digitalWrite(out1,HIGH);
-        digitalWrite(out10,HIGH);
-        delay(de);
-        if(temp<th){
-        digitalWrite(out11,HIGH);
-            }
-        delay(de);
-        delay(la);
-        for(int i=1;i<=10;i++){
-        digitalWrite(out1,HIGH);
-        delay(250);
-        digitalWrite(out1,LOW);
-         delay(250);
-            }
-        delay(y);
-        
-        delay(de);
-        while(mm<60){
-        mm_write();
-       Serial.println(mm);
-            
-        hh=2;
-        hh_write();
-        digitalWrite(out2,LOW);
-        digitalWrite(out3,HIGH);
-        for(int i=1;i<=3;i++){
-        digitalWrite(out1,HIGH);
-        delay(x);
-        digitalWrite(out1,LOW);
-        delay(x);
-        }
-        break;
-        
-            
-        case 2:
-        
-            
-        
-        digitalWrite(out1,HIGH);
-        digitalWrite(out10,LOW);
-        digitalWrite(out11,LOW);  
-        break;
-        case 3://j.a.r
-        for(int i=1;i<=3;i++){   
-        digitalWrite(out1,HIGH);
-        delay(x);
-        digitalWrite(out1,LOW);
-        delay(x);
-        }
-        digitalWrite(out1,HIGH);
-        digitalWrite(out10,HIGH);
-        delay(la);
-        if(temp<th){
-        digitalWrite(out11,HIGH);
-            }
-        delay(de);
-        hh=4;
-        hh_write();
-          digitalWrite(out3,LOW);
-         digitalWrite(out4,HIGH);
-        for(int i=1;i<=4;i++){
-        digitalWrite(out1,HIGH);
-        delay(x);
-        digitalWrite(out1,LOW);
-        delay(x);
-        }
-        digitalWrite(out1,HIGH);
-        
-        delay(de);
-        delay(de);
-        delay(de);
-        break;
-        case 4:
-        digitalWrite(out1,HIGH);
-        digitalWrite(out10,LOW);
-        digitalWrite(out11,LOW);
-        break;
-        case 5://j.m.b
-        for(int i=1;i<=4;i++){
-        digitalWrite(out1,HIGH);
-        delay(x);
-        digitalWrite(out1,LOW);
-        delay(x);
-        }
-        digitalWrite(out1,HIGH);
-        digitalWrite(out10,HIGH);
-        if(temp<th){
-        digitalWrite(out11,HIGH);
-            }
-        delay(de);
-        hh=6;
-        hh_write();
-         digitalWrite(out4,LOW);
-         digitalWrite(out5,HIGH);
-        for(int i=1;i<=5;i++){
-        digitalWrite(out1,HIGH);
-        delay(x);
-        digitalWrite(out1,LOW);
-        delay(x);
-        }
-        break;
-        case 6:
-        digitalWrite(out1,HIGH);
-        digitalWrite(out10,LOW);
-        digitalWrite(out11,LOW);
-        break;
-        case 7://j.e.sh
-        for(int i=1;i<=5;i++){
-        digitalWrite(out1,HIGH);
-        delay(x);
-        digitalWrite(out1,LOW);
-        delay(x);
-        }
-        digitalWrite(out1,HIGH);
-        digitalWrite(out10,HIGH);
-        delay(de);
-        if(temp<th){
-        digitalWrite(out11,HIGH);
-            }
-        delay(de);
-        delay(de);
-        delay(y);
-        
-        hh=8;
-        digitalWrite(out1,HIGH);
-        delay(1000);
-        hh_write();
-            digitalWrite(out5,LOW);
-            digitalWrite(out6,HIGH);
-            digitalWrite(out1,LOW);
-        delay(1000);
-        break;
-        case 8:
-        
-        digitalWrite(out1,HIGH);
-        digitalWrite(out10,LOW);
-        digitalWrite(out11,LOW);
-        break;
-            case 9: //j.f.r
-        digitalWrite(out1,HIGH);
-        digitalWrite(out10,HIGH);
-        delay(de);//15mint
-        delay(y); //5mint
-        delay(y);
-        delay(y);
-        if(temp<th){
-        digitalWrite(out11,HIGH);//f
-            }
-        delay(de); //15mint
-        delay(y);//5mint
-        hh=10;
-        hh_write();
-            digitalWrite(out6,LOW);
-            digitalWrite(out7,HIGH);
-        for(int i=1;i<=2;i++){
-        digitalWrite(out1,HIGH);
-        delay(x);
-        digitalWrite(out1,LOW);
-        delay(x);
-        }
-        break;
-        case 10:
-        digitalWrite(out10,LOW);
-        digitalWrite(out1,HIGH);
-        digitalWrite(out11,LOW);
-        break;
-            
-        //juma off
-        
-        case 11://h.f.r
-        digitalWrite(out1,HIGH);
-        digitalWrite(out10,HIGH);
-        delay(de);//15mint
-        delay(de); //15mint
-        if(temp<th){
-        digitalWrite(out11,HIGH);
-            }
-        delay(de);
-        delay(de);//5mint
-        delay(de);
-            
-            
-        hh=12;
-        hh_write();
-            digitalWrite(out7,LOW);
-            digitalWrite(out2,HIGH);
-        for(int i=1;i<=2;i++){
-        digitalWrite(out1,HIGH);
-        delay(x);
-        digitalWrite(out1,LOW);
-        delay(x);
-        }
-        break;
-        case 12:
-        digitalWrite(out10,LOW);
-        digitalWrite(out1,HIGH);
-         
-            delay(100);
-            
-            
-              mm++;
-            mm_write();
-            }     
-        break; 
-        hh=0;
-        
-        digitalWrite(out2,HIGH);
-        delay(1000);
-        hh_write();
-        
-        break;
-        default :
-        hh=0;
-        for(int i=1;i<=5;i++){
-        digitalWrite(out1,HIGH);
-        delay(500);
-         
-        digitalWrite(out1,LOW);
-        delay(500);
-            }
-        
-        
-    }
-       
-  }  
-
-void hh_write(){ 
-    Serial.println(hh);
-EEPROM.write(1,  hh%10);
-EEPROM.write(2, (hh/10)%10);
-EEPROM.write(3, (hh/100)%10);
-EEPROM.write(4, (hh/1000)%10);
-}
-void hh_read(){
-hh=EEPROM.read(4)*1000+EEPROM.read(3)*100+EEPROM.read(2)*10+EEPROM.read(1);
-}
-void mm_write(){ 
-    Serial.println(mm);
-EEPROM.write(5,  mm%10);
-EEPROM.write(6, (mm/10)%10);
-EEPROM.write(7, (mm/100)%10);
-EEPROM.write(8, (mm/1000)%10);
-}
-void mm_read(){
-mm=EEPROM.read(8)*1000+EEPROM.read(7)*100+EEPROM.read(6)*10+EEPROM.read(5);
-}
-
-void ss_write(){ 
-    Serial.println(ss);
-EEPROM.write(9,  ss%10);
-EEPROM.write(10, (ss/10)%10);
-EEPROM.write(11, (ss/100)%10);
-EEPROM.write(12, (ss/1000)%10);
-}
-void ss_read(){
-ss=EEPROM.read(12)*1000+EEPROM.read(11)*100+EEPROM.read(10)*10+EEPROM.read(9);
+  }
 }
